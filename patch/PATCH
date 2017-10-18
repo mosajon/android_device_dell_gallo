@@ -1,0 +1,124 @@
+--- a/build/target/product/full_base.mk
++++ b/build/target/product/full_base.mk
+@@ -37,7 +37,7 @@
+     ro.com.android.dateformat=MM-dd-yyyy
+ 
+ # Put en_US first in the list, so make it default.
+-PRODUCT_LOCALES := en_US
++PRODUCT_LOCALES := zh_CN
+ 
+ # Get some sounds
+ $(call inherit-product-if-exists, frameworks/base/data/sounds/AllAudio.mk)
+
+--- a/dalvik/vm/native/dalvik_system_Zygote.cpp
++++ b/dalvik/vm/native/dalvik_system_Zygote.cpp
+@@ -19,6 +19,7 @@
+  */
+ #include "Dalvik.h"
+ #include "native/InternalNativePriv.h"
++#include <sys/resource.h>
+ 
+ #include <signal.h>
+ #if (__GNUC__ == 4 && __GNUC_MINOR__ == 7)
+
+--- a/external/bluetooth/bluez/compat/Android.mk
++++ b/external/bluetooth/bluez/compat/Android.mk
+@@ -30,3 +30,30 @@
+ 
+ include $(BUILD_EXECUTABLE)
+ endif
++
++#
++# hidd
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES:= \
++	hidd.c fakehid.c sdp.c
++
++LOCAL_CFLAGS:= \
++	-DVERSION=\"4.93\" -DSTORAGEDIR=\"/data/misc/bluetoothd\" -DNEED_PPOLL -D__ANDROID__
++
++LOCAL_C_INCLUDES:=\
++	$(LOCAL_PATH)/../lib \
++	$(LOCAL_PATH)/../src \
++	$(LOCAL_PATH)/../common \
++
++LOCAL_SHARED_LIBRARIES := \
++	libbluetoothd \
++	libbluetooth \
++	libcutils
++
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE:=hidd
++
++include $(BUILD_EXECUTABLE)
+
+--- a/hardware/libhardware/include/hardware/gralloc.h
++++ b/hardware/libhardware/include/hardware/gralloc.h
+@@ -79,13 +79,13 @@
+     /* mask for the software usage bit-mask */
+     GRALLOC_USAGE_HW_MASK               = 0x00011F00,
+ 
+-#ifdef SAMSUNG_CODEC_SUPPORT
++//#ifdef SAMSUNG_CODEC_SUPPORT
+     GRALLOC_USAGE_HW_FIMC1              = 0x01000000,
+     GRALLOC_USAGE_HW_ION                = 0x02000000,
+     GRALLOC_USAGE_YUV_ADDR              = 0x04000000,
+     /* SEC Private usage , for Overlay path at HWC */
+     GRALLOC_USAGE_HWC_HWOVERLAY         = 0x20000000,
+-#endif
++//#endif
+ 
+     /* buffer should be displayed full-screen on an external display when
+      * possible
+
+--- a/hardware/libhardware_legacy/vibrator/vibrator.c
++++ b/hardware/libhardware_legacy/vibrator/vibrator.c
+@@ -26,7 +26,8 @@
+ extern int sendit(int timeout_ms);
+ #else
+ 
+-#define THE_DEVICE "/sys/class/timed_output/vibrator/enable"
++//#define THE_DEVICE "/sys/class/timed_output/vibrator/enable"
++#define THE_DEVICE "/sys/class/haptic/isa1200/oneshot"
+ 
+ int vibrator_exists()
+ {
+
+--- a/packages/apps/Browser/res/values-zh-rCN/strings.xml
++++ b/packages/apps/Browser/res/values-zh-rCN/strings.xml
+@@ -142,7 +142,7 @@
+     <string name="pref_content_homepage" msgid="3324574611613105696">"设置主页"</string>
+     <string name="pref_content_search_engine" msgid="1620101310821644144">"设置搜索引擎"</string>
+     <string name="pref_content_search_engine_summary" msgid="304003941861818133">"选择搜索引擎"</string>
+-    <string name="pref_content_uastring">用户代理t</string>
++    <string name="pref_content_uastring">用户代理</string>
+     <string name="pref_content_uastring_summary">为请求的页面选择你的用户代理</string>
+     <string name="pref_set_homepage_to" msgid="7838684355145561242">"设置为"</string>
+   <string-array name="pref_homepage_choices">
+
+--- a/vendor/cm/config/common.mk
++++ b/vendor/cm/config/common.mk
+@@ -53,7 +53,8 @@
+ PRODUCT_COPY_FILES +=  \
+     vendor/cm/proprietary/RomManager.apk:system/app/RomManager.apk \
+     vendor/cm/proprietary/Term.apk:system/app/Term.apk \
+-    vendor/cm/proprietary/lib/armeabi/libjackpal-androidterm4.so:system/lib/libjackpal-androidterm4.so \
++    vendor/cm/proprietary/lib/armeabi/libjackpal-androidterm5.so:system/lib/libjackpal-androidterm5.so \
++    vendor/cm/proprietary/lib/armeabi/libjackpal-termexec2.so:system/lib/libjackpal-termexec2.so \
+ 	vendor/cm/prebuilt/common/apps/Superuser.apk:system/app/Superuser.apk
+ 
+ # Bring in camera effects
+
+--- a/vendor/cm/get-prebuilts
++++ b/vendor/cm/get-prebuilts
+@@ -8,5 +8,5 @@
+ 
+ # Get Android Terminal Emulator (we use a prebuilt so it can update from the Market)
+ curl -L -o $BASEDIR/proprietary/Term.apk -O -L http://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk
+-unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/armeabi/libjackpal-androidterm4.so
++unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/*
+ 
+
