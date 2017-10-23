@@ -8,12 +8,12 @@ now fixed:
  green overlay issue (also modified in kernel, THX gh123man)
  wifi is working 
  audio is working (referenced from koush, THX)
- bluotooth
- usb access to computer
- storage tab in setting
 
 malfunction:
+ bluotooth
  camera
+ usb access to computer
+ storage tab in setting
  some boot problem due to the bluetooth problem
 
 About how to make a vendor folder:
