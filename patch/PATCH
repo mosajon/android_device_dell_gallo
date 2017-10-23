@@ -1,5 +1,5 @@
---- /root/cm10.1/bootable/recovery/etc/init.rc
-+++ /root/cm10.1-old/bootable/recovery/etc/init.rc
+--- a/bootable/recovery/etc/init.rc
++++ b/bootable/recovery/etc/init.rc
 @@ -16,7 +16,6 @@
      mkdir /sdcard
      mkdir /internal_sd
@@ -9,8 +9,8 @@
      mkdir /emmc
      mkdir /system
 
---- /root/cm10.1/bootable/recovery/updater/updater.c
-+++ /root/cm10.1-old/bootable/recovery/updater/updater.c
+--- a/bootable/recovery/updater/updater.c
++++ b/bootable/recovery/updater/updater.c
 @@ -112,7 +112,7 @@
      sehandle = selabel_open(SELABEL_CTX_FILE, seopts, 1);
  
@@ -20,8 +20,8 @@
          // fprintf(cmd_pipe, "ui_print Warning: No file_contexts\n");
      }
  
---- /root/cm10.1/bootable/recovery/recovery.c
-+++ /root/cm10.1-old/bootable/recovery/recovery.c
+--- a/bootable/recovery/recovery.c
++++ b/bootable/recovery/recovery.c
 @@ -887,8 +887,8 @@
      sehandle = selabel_open(SELABEL_CTX_FILE, seopts, 1);
  
@@ -34,8 +34,8 @@
  
      LOGI("device_recovery_start()\n");
 
---- /root/cm10.1/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
-+++ /root/cm10.1-old/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
+--- a/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
++++ b/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
 @@ -153,7 +153,11 @@
  static const char gVideoFragmentShader[] =
      "#extension GL_OES_EGL_image_external : require\n"
@@ -73,8 +73,8 @@
      "  vec4 pixel = texture2D(s_texture, v_texCoord); \n"
      "  float a = pixel.a; \n"
 
---- /root/cm10.1/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
-+++ /root/cm10.1-old/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
+--- a/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
++++ b/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
 @@ -65,6 +65,7 @@
      size_t bufWidth, bufHeight;
  
@@ -92,8 +92,8 @@
          default:
              halFormat = HAL_PIXEL_FORMAT_RGB_565;
 
---- /root/cm10.1/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
-+++ /root/cm10.1-old/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
+--- a/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
++++ b/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
 @@ -211,6 +211,15 @@
  
      // we have a h/w allocator and h/w buffer is requested
@@ -111,8 +111,8 @@
      if ((format == 0x101) || (format == 0x105) || (format == 0x107)) {
          // 0x101 = HAL_PIXEL_FORMAT_YCbCr_420_P (Samsung-specific pixel format)
 
---- /root/cm10.1/frameworks/native/libs/ui/GraphicBufferMapper.cpp
-+++ /root/cm10.1-old/frameworks/native/libs/ui/GraphicBufferMapper.cpp
+--- a/frameworks/native/libs/ui/GraphicBufferMapper.cpp
++++ b/frameworks/native/libs/ui/GraphicBufferMapper.cpp
 @@ -75,10 +75,23 @@
  {
      ATRACE_CALL();
@@ -138,8 +138,8 @@
      ALOGW_IF(err, "lock(...) failed %d (%s)", err, strerror(-err));
      return err;
 
---- /root/cm10.1/frameworks/native/opengl/include/GLES/glext.h
-+++ /root/cm10.1-old/frameworks/native/opengl/include/GLES/glext.h
+--- a/frameworks/native/opengl/include/GLES/glext.h
++++ b/frameworks/native/opengl/include/GLES/glext.h
 @@ -71,7 +71,12 @@
  /* GL_OES_EGL_image_external */
  #ifndef GL_OES_EGL_image_external
@@ -154,8 +154,8 @@
  #define GL_REQUIRED_TEXTURE_IMAGE_UNITS_OES                     0x8D68
  #endif
 
---- /root/cm10.1/frameworks/native/opengl/include/GLES2/gl2ext.h
-+++ /root/cm10.1-old/frameworks/native/opengl/include/GLES2/gl2ext.h
+--- a/frameworks/native/opengl/include/GLES2/gl2ext.h
++++ b/frameworks/native/opengl/include/GLES2/gl2ext.h
 @@ -60,7 +60,11 @@
  /* GL_OES_EGL_image_external */
  #ifndef GL_OES_EGL_image_external
@@ -169,8 +169,8 @@
  #define GL_TEXTURE_BINDING_EXTERNAL_OES                         0x8D67
  #define GL_REQUIRED_TEXTURE_IMAGE_UNITS_OES                     0x8D68
 
---- /root/cm10.1/frameworks/native/opengl/libagl/state.cpp
-+++ /root/cm10.1-old/frameworks/native/opengl/libagl/state.cpp
+--- a/frameworks/native/opengl/libagl/state.cpp
++++ b/frameworks/native/opengl/libagl/state.cpp
 @@ -192,9 +192,11 @@
          // these need to fall through into the rasterizer
          c->rasterizer.procs.enableDisable(c, cap, enabled);
@@ -184,8 +184,8 @@
      case GL_MULTISAMPLE:
      case GL_SAMPLE_ALPHA_TO_COVERAGE:
 
---- /root/cm10.1/frameworks/native/services/surfaceflinger/Layer.cpp
-+++ /root/cm10.1-old/frameworks/native/services/surfaceflinger/Layer.cpp
+--- a/frameworks/native/services/surfaceflinger/Layer.cpp
++++ b/frameworks/native/services/surfaceflinger/Layer.cpp
 @@ -782,7 +782,12 @@
          // need a hardware-protected path to external video sink
          usage |= GraphicBuffer::USAGE_PROTECTED;
@@ -199,8 +199,8 @@
      return usage;
  }
  
---- /root/cm10.1/hardware/libhardware_legacy/vibrator/Android.mk
-+++ /root/cm10.1-old/hardware/libhardware_legacy/vibrator/Android.mk
+--- a/hardware/libhardware_legacy/vibrator/Android.mk
++++ b/hardware/libhardware_legacy/vibrator/Android.mk
 @@ -1,6 +1,10 @@
  # Copyright 2006 The Android Open Source Project
  
@@ -214,8 +214,8 @@
  ## Must point to a source file that implements the sendit() function
  ifneq ($(BOARD_HAS_VIBRATOR_IMPLEMENTATION),)
 
---- /root/cm10.1/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
-+++ /root/cm10.1-old/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
+--- a/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
++++ b/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
 @@ -29,7 +29,11 @@
  };
  GLushort g_iIndices2[] = { 0, 1, 2, 3 };
@@ -241,8 +241,8 @@
          "  gl_FragColor = texture2D(sTexture, vTextureNormCoord);\n"
          "}\n";
 
---- /root/cm10.1/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
-+++ /root/cm10.1-old/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
+--- a/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
++++ b/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
 @@ -166,7 +166,11 @@
      0.0, 1.0, 0.0,
      0.0, 0.0, 1.0};
@@ -256,8 +256,8 @@
  static void printGLString(const char *name, GLenum s) {
      const char *v = (const char *) glGetString(s);
 
---- /root/cm10.1/packages/apps/Settings/res/values-zh-rCN/cm_strings.xml
-+++ /root/cm10.1-old/packages/apps/Settings/res/values-zh-rCN/cm_strings.xml
+--- a/packages/apps/Settings/res/values-zh-rCN/cm_strings.xml
++++ b/packages/apps/Settings/res/values-zh-rCN/cm_strings.xml
 @@ -660,7 +660,7 @@
      <string name="navring_action_torch">手电筒开关</string>
      <string name="navring_action_google_now">Google 即时</string>
@@ -268,8 +268,8 @@
      <string name="pie_control_disabled">已禁用</string>
      <string name="pie_control_sensitivity_title">响应度</string>
 
---- /root/cm10.1/vendor/cm/config/common.mk
-+++ /root/cm10.1-old/vendor/cm/config/common.mk
+--- a/vendor/cm/config/common.mk
++++ b/vendor/cm/config/common.mk
 @@ -209,7 +209,8 @@
  # Terminal Emulator
  PRODUCT_COPY_FILES +=  \
