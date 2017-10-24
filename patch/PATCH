@@ -1,0 +1,342 @@
+--- a/build/tools/releasetools/ota_from_target_files
++++ b/build/tools/releasetools/ota_from_target_files
+@@ -420,8 +420,8 @@
+ 
+   boot_img = common.GetBootableImage("boot.img", "boot.img",
+                                      OPTIONS.input_tmp, "BOOT")
+-  #recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
+-  #                                       OPTIONS.input_tmp, "RECOVERY")
++  recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
++                                         OPTIONS.input_tmp, "RECOVERY")
+   #MakeRecoveryPatch(output_zip, recovery_img, boot_img)
+ 
+   Item.GetMetadata(input_zip)
+@@ -431,6 +431,10 @@
+   common.ZipWriteStr(output_zip, "boot.img", boot_img.data)
+   script.ShowProgress(0.2, 0)
+ 
++  common.CheckSize(recovery_img.data, "recovery.img", OPTIONS.info_dict)
++  common.ZipWriteStr(output_zip, "recovery.img", recovery_img.data)
++  script.ShowProgress(0.2, 0)
++
+   if OPTIONS.backuptool:
+     script.ShowProgress(0.2, 10)
+     script.RunBackup("restore")
+@@ -440,6 +444,9 @@
+ 
+   script.ShowProgress(0.2, 10)
+   script.WriteRawImage("/boot", "boot.img")
++
++  script.ShowProgress(0.2, 10)
++  script.WriteRawImage("/recovery", "recovery.img")
+ 
+   script.ShowProgress(0.1, 0)
+   device_specific.FullOTA_InstallEnd()
+
+--- a/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
++++ b/external/webkit/Source/WebCore/platform/graphics/android/rendering/ShaderProgram.cpp
+@@ -153,7 +153,11 @@
+ static const char gVideoFragmentShader[] =
+     "#extension GL_OES_EGL_image_external : require\n"
+     "precision mediump float;\n"
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++    "uniform sampler2D s_yuvTexture;\n"
++#else
+     "uniform samplerExternalOES s_yuvTexture;\n"
++#endif
+     "varying vec2 v_texCoord;\n"
+     "void main() {\n"
+     "  gl_FragColor = texture2D(s_yuvTexture, v_texCoord);\n"
+@@ -164,7 +168,11 @@
+     "precision mediump float;\n"
+     "varying vec2 v_texCoord; \n"
+     "uniform float alpha; \n"
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++    "uniform sampler2D s_texture;\n"
++#else
+     "uniform samplerExternalOES s_texture; \n"
++#endif
+     "void main() {\n"
+     "  gl_FragColor = texture2D(s_texture, v_texCoord); \n"
+     "  gl_FragColor *= alpha; "
+@@ -176,7 +184,11 @@
+     "varying vec2 v_texCoord; \n"
+     "uniform float alpha; \n"
+     "uniform float contrast; \n"
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++    "uniform sampler2D s_texture;\n"
++#else
+     "uniform samplerExternalOES s_texture; \n"
++#endif
+     "void main() {\n"
+     "  vec4 pixel = texture2D(s_texture, v_texCoord); \n"
+     "  float a = pixel.a; \n"
+
+--- a/external/wpa_supplicant_8/hostapd/src/ap/ap_config.c
++++ b/external/wpa_supplicant_8/hostapd/src/ap/ap_config.c
+@@ -161,7 +161,7 @@
+ 
+ 	/* Enable ieee80211d and set US as default country */
+ 	conf->ieee80211d = 1;
+-	os_memcpy(conf->country, "US ", 3);
++	os_memcpy(conf->country, "CN ", 3);
+ #endif
+ 
+ 	return conf;
+
+--- a/external/wpa_supplicant_8/src/ap/ap_config.c
++++ b/external/wpa_supplicant_8/src/ap/ap_config.c
+@@ -161,7 +161,7 @@
+ 
+ 	/* Enable ieee80211d and set US as default country */
+ 	conf->ieee80211d = 1;
+-	os_memcpy(conf->country, "US ", 3);
++	os_memcpy(conf->country, "CN ", 3);
+ #endif
+ 
+ 	return conf;
+
+--- a/external/wpa_supplicant_8/wpa_supplicant/src/ap/ap_config.c
++++ b/external/wpa_supplicant_8/wpa_supplicant/src/ap/ap_config.c
+@@ -161,7 +161,7 @@
+ 
+ 	/* Enable ieee80211d and set US as default country */
+ 	conf->ieee80211d = 1;
+-	os_memcpy(conf->country, "US ", 3);
++	os_memcpy(conf->country, "CN ", 3);
+ #endif
+ 
+ 	return conf;
+
+--- a/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
++++ b/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
+@@ -65,6 +65,7 @@
+     size_t bufWidth, bufHeight;
+ 
+     switch (mColorFormat) {
++#ifndef MISSING_EGL_PIXEL_FORMAT_YV12
+         case OMX_COLOR_FormatYUV420Planar:
+         case OMX_TI_COLOR_FormatYUV420PackedSemiPlanar:
+         {
+@@ -77,6 +78,7 @@
+ 
+             // fall through.
+         }
++#endif
+ 
+         default:
+             halFormat = HAL_PIXEL_FORMAT_RGB_565;
+
+--- a/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
++++ b/frameworks/native/libs/ui/GraphicBufferAllocator.cpp
+@@ -111,7 +111,15 @@
+         w = h = 1;
+ 
+     // we have a h/w allocator and h/w buffer is requested
+-    status_t err; 
++
++#ifdef MISSING_EGL_PIXEL_FORMAT_YV12
++    if (format == HAL_PIXEL_FORMAT_YV12) {
++	format = HAL_PIXEL_FORMAT_RGBX_8888;
++    }
++    if (usage & GRALLOC_USAGE_EXTERNAL_DISP) {
++	usage ^= GRALLOC_USAGE_EXTERNAL_DISP;
++    }
++#endif
+ 
+ #ifdef EXYNOS4_ENHANCEMENTS
+     if ((format == 0x101) || (format == 0x105)) {
+@@ -120,6 +128,8 @@
+         usage |= GRALLOC_USAGE_HW_FIMC1; // Exynos HWC wants FIMC-friendly memory allocation
+     }
+ #endif
++
++    status_t err;
+ 
+ #ifdef QCOM_HARDWARE
+     if(bufferSize) {
+
+--- a/frameworks/native/libs/ui/GraphicBufferMapper.cpp
++++ b/frameworks/native/libs/ui/GraphicBufferMapper.cpp
+@@ -75,10 +75,23 @@
+ {
+     ATRACE_CALL();
+     status_t err;
++#ifdef MISSING_GRALLOC_BUFFERS
++    int tries=5;
++#endif
+ 
+     err = mAllocMod->lock(mAllocMod, handle, usage,
+             bounds.left, bounds.top, bounds.width(), bounds.height(),
+             vaddr);
++#ifdef MISSING_GRALLOC_BUFFERS
++    while (err && tries) {
++	usleep(1000);
++        err = mAllocMod->unlock(mAllocMod, handle);
++        err = mAllocMod->lock(mAllocMod, handle, usage,
++            bounds.left, bounds.top, bounds.width(), bounds.height(),
++            vaddr);
++	tries--;
++    }
++#endif
+ 
+     ALOGW_IF(err, "lock(...) failed %d (%s)", err, strerror(-err));
+     return err;
+
+--- a/frameworks/native/opengl/include/GLES/glext.h
++++ b/frameworks/native/opengl/include/GLES/glext.h
+@@ -71,7 +71,12 @@
+ /* GL_OES_EGL_image_external */
+ #ifndef GL_OES_EGL_image_external
+ /* GLeglImageOES defined in GL_OES_EGL_image already. */
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++#define GL_TEXTURE_EXTERNAL_OES                                 0x0DE1
++#else
+ #define GL_TEXTURE_EXTERNAL_OES                                 0x8D65
++#endif
++#define GL_SAMPLER_EXTERNAL_OES                                 0x8D66
+ #define GL_TEXTURE_BINDING_EXTERNAL_OES                         0x8D67
+ #define GL_REQUIRED_TEXTURE_IMAGE_UNITS_OES                     0x8D68
+ #endif
+
+--- a/frameworks/native/opengl/include/GLES2/gl2ext.h
++++ b/frameworks/native/opengl/include/GLES2/gl2ext.h
+@@ -60,7 +60,11 @@
+ /* GL_OES_EGL_image_external */
+ #ifndef GL_OES_EGL_image_external
+ /* GLeglImageOES defined in GL_OES_EGL_image already. */
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++#define GL_TEXTURE_EXTERNAL_OES                                 0x0DE1
++#else
+ #define GL_TEXTURE_EXTERNAL_OES                                 0x8D65
++#endif
+ #define GL_SAMPLER_EXTERNAL_OES                                 0x8D66
+ #define GL_TEXTURE_BINDING_EXTERNAL_OES                         0x8D67
+ #define GL_REQUIRED_TEXTURE_IMAGE_UNITS_OES                     0x8D68
+
+--- a/frameworks/native/opengl/libagl/state.cpp
++++ b/frameworks/native/opengl/libagl/state.cpp
+@@ -192,9 +192,11 @@
+         // these need to fall through into the rasterizer
+         c->rasterizer.procs.enableDisable(c, cap, enabled);
+         break;
++#ifndef MISSING_EGL_EXTERNAL_IMAGE
+     case GL_TEXTURE_EXTERNAL_OES:
+         c->rasterizer.procs.enableDisable(c, GL_TEXTURE_2D, enabled);
+         break;
++#endif
+ 
+     case GL_MULTISAMPLE:
+     case GL_SAMPLE_ALPHA_TO_COVERAGE:
+
+--- a/frameworks/native/services/surfaceflinger/Layer.cpp
++++ b/frameworks/native/services/surfaceflinger/Layer.cpp
+@@ -804,7 +804,12 @@
+         // need a hardware-protected path to external video sink
+         usage |= GraphicBuffer::USAGE_PROTECTED;
+     }
++#ifdef MISSING_GRALLOC_BUFFERS
++    usage |= GraphicBuffer::USAGE_HW_TEXTURE;
++#else
+     usage |= GraphicBuffer::USAGE_HW_COMPOSER;
++#endif
++
+     return usage;
+ }
+ 
+
+--- a/hardware/libhardware_legacy/vibrator/Android.mk
++++ b/hardware/libhardware_legacy/vibrator/Android.mk
+@@ -1,6 +1,10 @@
+ # Copyright 2006 The Android Open Source Project
+ 
+-LOCAL_SRC_FILES += vibrator/vibrator.c
++ifeq ($(TARGET_DEVICE),gallo)
++    LOCAL_SRC_FILES += vibrator/vibrator_gallo.c
++else
++    LOCAL_SRC_FILES += vibrator/vibrator.c
++endif
+ 
+ ## Must point to a source file that implements the sendit() function
+ ifneq ($(BOARD_HAS_VIBRATOR_IMPLEMENTATION),)
+
+--- a/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
++++ b/packages/apps/Camera/jni/feature_mos/src/mosaic_renderer/SurfaceTextureRenderer.cpp
+@@ -29,7 +29,11 @@
+ };
+ GLushort g_iIndices2[] = { 0, 1, 2, 3 };
+ 
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++const int GL_TEXTURE_EXTERNAL_OES_ENUM = 0x0DE1;
++#else
+ const int GL_TEXTURE_EXTERNAL_OES_ENUM = 0x8D65;
++#endif
+ 
+ const int VERTEX_STRIDE = 6 * sizeof(GLfloat);
+ 
+@@ -177,7 +181,11 @@
+         "#extension GL_OES_EGL_image_external : require\n"
+         "precision mediump float;\n"
+         "varying vec2 vTextureNormCoord;\n"
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++        "uniform sampler2D sTexture;\n"
++#else
+         "uniform samplerExternalOES sTexture;\n"
++#endif
+         "void main() {\n"
+         "  gl_FragColor = texture2D(sTexture, vTextureNormCoord);\n"
+         "}\n";
+
+--- a/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
++++ b/packages/apps/Camera/jni/mosaic_renderer_jni.cpp
+@@ -166,7 +166,11 @@
+     0.0, 1.0, 0.0,
+     0.0, 0.0, 1.0};
+ 
++#ifdef MISSING_EGL_EXTERNAL_IMAGE
++const int GL_TEXTURE_EXTERNAL_OES_ENUM = 0x0DE1;
++#else
+ const int GL_TEXTURE_EXTERNAL_OES_ENUM = 0x8D65;
++#endif
+ 
+ static void printGLString(const char *name, GLenum s) {
+     const char *v = (const char *) glGetString(s);
+
+--- a/system/core/include/private/android_filesystem_config.h
++++ b/system/core/include/private/android_filesystem_config.h
+@@ -265,6 +265,7 @@
+     { 00750, AID_ROOT,      AID_SHELL,     "sbin/fs_mgr" },
+     { 00640, AID_ROOT,      AID_SHELL,     "fstab.*" },
+     { 00755, AID_ROOT,      AID_SHELL,     "system/etc/init.d/*" },
++    { 00755, AID_ROOT,      AID_SHELL,     "system/bin/sdcard.sh" },
+     { 00644, AID_ROOT,      AID_ROOT,       0 },
+ };
+ 
+
+--- a/vendor/cm/config/common.mk
++++ b/vendor/cm/config/common.mk
+@@ -100,9 +100,11 @@
+ PRODUCT_COPY_FILES += \
+     vendor/cm/prebuilt/common/bin/modelid_cfg.sh:system/bin/modelid_cfg.sh
+ 
++#    vendor/cm/proprietary/lib/armeabi/libjackpal-androidterm4.so:system/lib/libjackpal-androidterm4.so
+ PRODUCT_COPY_FILES +=  \
+     vendor/cm/proprietary/Term.apk:system/app/Term.apk \
+-    vendor/cm/proprietary/lib/armeabi/libjackpal-androidterm4.so:system/lib/libjackpal-androidterm4.so
++    vendor/cm/proprietary/lib/armeabi/libjackpal-androidterm5.so:system/lib/libjackpal-androidterm5.so \
++    vendor/cm/proprietary/lib/armeabi/libjackpal-termexec2.so:system/lib/libjackpal-termexec2.so \
+ 
+ # Bring in camera effects
+ PRODUCT_COPY_FILES +=  \
+
+--- a/vendor/cm/get-prebuilts
++++ b/vendor/cm/get-prebuilts
+@@ -4,6 +4,6 @@
+ mkdir -p $BASEDIR/proprietary
+ 
+ # Get Android Terminal Emulator (we use a prebuilt so it can update from the Market)
+-curl -L -o $BASEDIR/proprietary/Term.apk -O -L https://jackpal.github.io/Android-Terminal-Emulator/downloads/Term-1.0.65.apk
++curl -L -o $BASEDIR/proprietary/Term.apk -O -L http://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk
+ unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/*
+ 
+
