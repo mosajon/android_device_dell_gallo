@@ -72,32 +72,8 @@
      "  vec4 pixel = texture2D(s_texture, v_texCoord); \n"
      "  float a = pixel.a; \n"
 
---- a/external/wpa_supplicant_8/hostapd/src/ap/ap_config.c
-+++ b/external/wpa_supplicant_8/hostapd/src/ap/ap_config.c
-@@ -161,7 +161,7 @@
- 
- 	/* Enable ieee80211d and set US as default country */
- 	conf->ieee80211d = 1;
--	os_memcpy(conf->country, "US ", 3);
-+	os_memcpy(conf->country, "CN ", 3);
- #endif
- 
- 	return conf;
-
 --- a/external/wpa_supplicant_8/src/ap/ap_config.c
 +++ b/external/wpa_supplicant_8/src/ap/ap_config.c
-@@ -161,7 +161,7 @@
- 
- 	/* Enable ieee80211d and set US as default country */
- 	conf->ieee80211d = 1;
--	os_memcpy(conf->country, "US ", 3);
-+	os_memcpy(conf->country, "CN ", 3);
- #endif
- 
- 	return conf;
-
---- a/external/wpa_supplicant_8/wpa_supplicant/src/ap/ap_config.c
-+++ b/external/wpa_supplicant_8/wpa_supplicant/src/ap/ap_config.c
 @@ -161,7 +161,7 @@
  
  	/* Enable ieee80211d and set US as default country */
