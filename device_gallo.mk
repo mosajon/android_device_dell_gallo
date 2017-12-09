@@ -109,7 +109,6 @@ PRODUCT_PACKAGES += \
     setup_fs \
     make_ext4fs \
     libinvensense_mpl \
-    liba2dp \
     libasound \
     tinyrec \
 
